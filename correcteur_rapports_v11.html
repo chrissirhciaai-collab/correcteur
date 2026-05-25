@@ -304,7 +304,7 @@ function processDoc(){
   var k=localStorage.getItem('rc_k')||'';if(!k){openModal();return;}if(!fileText)return;
   var btn=document.getElementById('bgo');btn.disabled=true;document.getElementById('cres').style.display='none';docxBlob=null;
   showSts('<span class="spn"></span> 1/4 Masquage\u2026','ld');
-  var res=buildMap(fileText);pseudoMap=res.map;var anon=pseudo(fileText,res.rmap),n=Object.keys(res.rmap).length;
+  var res=buildMap(fileText);pseudoMap=res.map;var anon=pseudo(fileText,res.rmap),n=Object.keys(res.rmap).length;anon=anon.replace(/\b([Dd][Ee][Ss]?)\b(?=[^a-z])/g,function(m){return m===m.toUpperCase()&&m.length<=3?m.toLowerCase():m;});
   var scl=shortcuts.length?shortcuts.map(function(s){return '- "'+s.key+'" \u2192 "'+s.value+'"';}).join('\n'):'Aucun raccourci.';
   var prm='Tu es un expert en r\u00e9daction juridique fran\u00e7aise sp\u00e9cialis\u00e9 dans les rapports de surveillance.\n\nCodes [E1],[E2]\u2026 = donn\u00e9es sensibles. Conserve-les EXACTEMENT.\n\nR\u00c8GLES :\n- Jamais de Markdown\n- Horaires HHhMM uniquement (08h00, jamais 08:00)\n- Dates sur leur propre ligne\n- SUPPRIMER : D\u00e9but, Fin, Conclusion, Annexes\n- Garder le titre (1\u00e8re ligne)\n\nMISSION :\n1. Remplacer raccourcis\n2. Corriger orthographe/grammaire/ponctuation\n3. Typographie fran\u00e7aise\n4. Style factuel, professionnel\n5. 1\u00e8re personne pluriel, pr\u00e9sent de constat\n6. Ne pas ajouter d\'infos absentes\n\nRaccourcis :\n'+scl+'\n\nRetourne UNIQUEMENT le texte corrig\u00e9.';
   setTimeout(function(){
