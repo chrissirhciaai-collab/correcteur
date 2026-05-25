@@ -132,11 +132,26 @@ function LU(){
   <div class="card">
     <div class="cardh nt"><span class="cardl">Document &agrave; corriger</span></div>
     <div class="cardb">
-      <div class="drop" id="drp" ondragover="event.preventDefault();this.classList.add('dropov')" ondragleave="this.classList.remove('dropov')" ondrop="this.classList.remove('dropov');if(event.dataTransfer.files[0])handleFile(event.dataTransfer.files[0]);event.preventDefault()">
-        <input type="file" id="fin" accept=".docx,.rtf,.txt" onchange="if(this.files[0])handleFile(this.files[0])">
-        <div class="dic">&#128196;</div><div class="dtx">Choisir un fichier</div><div class="dht">.docx &middot; .rtf &middot; .txt</div>
+      <!-- Toggle fichier / coller -->
+      <div style="display:flex;gap:0;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);overflow:hidden;margin-bottom:12px">
+        <button id="tbf" onclick="setInput('file')" style="flex:1;padding:9px;font-size:13px;font-weight:600;border:none;background:#1a1916;color:#fff;cursor:pointer;font-family:inherit">&#128196; Fichier</button>
+        <button id="tbt" onclick="setInput('text')" style="flex:1;padding:9px;font-size:13px;font-weight:600;border:none;background:none;color:var(--t2);cursor:pointer;font-family:inherit">&#9998; Coller le texte</button>
       </div>
-      <div class="ftag" id="ftag" style="display:none"><span>&#128206;</span><span class="fnm" id="fnm"></span><button class="bx" onclick="clearFile()">&#10005;</button></div>
+      <!-- Zone fichier -->
+      <div id="zinput-file">
+        <div class="drop" id="drp" ondragover="event.preventDefault();this.classList.add('dropov')" ondragleave="this.classList.remove('dropov')" ondrop="this.classList.remove('dropov');if(event.dataTransfer.files[0])handleFile(event.dataTransfer.files[0]);event.preventDefault()">
+          <input type="file" id="fin" accept=".docx,.rtf,.txt" onchange="if(this.files[0])handleFile(this.files[0])">
+          <div class="dic">&#128196;</div>
+          <div class="dtx">Choisir un fichier</div>
+          <div class="dht">.docx &middot; .rtf &middot; .txt</div>
+        </div>
+        <div class="ftag" id="ftag" style="display:none"><span>&#128206;</span><span class="fnm" id="fnm"></span><button class="bx" onclick="clearFile()">&#10005;</button></div>
+      </div>
+      <!-- Zone coller -->
+      <div id="zinput-text" style="display:none">
+        <textarea id="tpaste" placeholder="Collez ici le texte de votre rapport..." style="width:100%;min-height:200px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:12px;font-size:14px;color:var(--tx);font-family:inherit;resize:vertical;outline:none;line-height:1.6" oninput="onPasteInput()"></textarea>
+        <button class="btn bsc bsm" onclick="clearPaste()" style="margin-top:6px">Effacer</button>
+      </div>
       <div id="pvw" style="display:none"><p style="font-size:12px;color:var(--pt);margin:10px 0 4px">&#128274; Masqu&eacute; avant envoi :</p><div class="pvb" id="pvc"></div></div>
       <div style="margin-top:14px"><button class="btn bpr" id="bgo" onclick="processDoc()" disabled>Corriger et g&eacute;n&eacute;rer le .docx</button></div>
       <div id="sts" style="display:none"></div>
