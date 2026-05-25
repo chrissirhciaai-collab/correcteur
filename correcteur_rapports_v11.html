@@ -382,11 +382,24 @@ function setInput(mode){
   if(!isFile){fileText='';document.getElementById('bgo').disabled=!document.getElementById('tpaste').value.trim();}
   else{document.getElementById('bgo').disabled=!fileText;}
 }
+function fixDE(txt){
+  // Remplace les prepositions/articles en MAJUSCULES isoles par leur version minuscule
+  return txt.replace(/\b(DE|DES|DU|LE|LA|LES|UN|UNE|AU|AUX|EN|ET|OU|NE|SE|SA|SI|CE|PAR|SUR|DANS|AVEC|SOUS|POUR|VERS|DONT|MAIS|DONT)(?=[\s,;:.!?\)])/g,
+    function(m){return m.toLowerCase();});
+}
 function onPasteInput(){
-  var v=document.getElementById('tpaste').value.trim();
-  fileText=v;
-  document.getElementById('bgo').disabled=!v;
-  if(v)updatePreview();
+  var el=document.getElementById('tpaste');
+  var raw=el.value;
+  var fixed=fixDE(raw);
+  if(fixed!==raw){
+    // Corriger le texte dans la zone directement
+    var pos=el.selectionStart;
+    el.value=fixed;
+    try{el.setSelectionRange(pos,pos);}catch(e){}
+  }
+  fileText=fixed.trim();
+  document.getElementById('bgo').disabled=!fileText;
+  if(fileText)updatePreview();
 }
 function clearPaste(){
   document.getElementById('tpaste').value='';
