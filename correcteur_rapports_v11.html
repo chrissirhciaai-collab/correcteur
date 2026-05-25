@@ -224,25 +224,35 @@ function handleFile(file){
   var ext=name.split('.').pop().toLowerCase();
   if(!ext||ext===name){var mt=file.type||'';ext=mt.indexOf('rtf')>=0?'rtf':mt.indexOf('word')>=0?'docx':'txt';}
   showSts('<span class="spn"></span> Lecture…','ld');
-  var tmr=setTimeout(function(){showSts('Timeout — essayez en .txt','er');},10000);
   var reader=new FileReader();
   reader.onload=function(e){
-    clearTimeout(tmr);
     setTimeout(function(){
       try{
         if(ext==='docx'){
           mammoth.extractRawText({arrayBuffer:e.target.result})
             .then(function(r){fileText=r.value;afterLoad(name);})
             .catch(function(er){showSts('Erreur : '+er.message,'er');});
+        }else if(ext==='rtf'){
+          // Convertir ArrayBuffer en string via Uint8Array
+          var arr=new Uint8Array(e.target.result);
+          var str='';
+          // Chunks de 1024 pour eviter le depassement de pile sur iOS
+          var chunk=1024;
+          for(var i=0;i<arr.length;i+=chunk){
+            var sub=arr.subarray(i,Math.min(i+chunk,arr.length));
+            for(var j=0;j<sub.length;j++) str+=String.fromCharCode(sub[j]);
+          }
+          fileText=stripRtf(str);
+          afterLoad(name);
         }else{
-          fileText=(ext==='rtf')?stripRtf(e.target.result):e.target.result;
+          fileText=e.target.result;
           afterLoad(name);
         }
       }catch(er){showSts('Erreur : '+er.message,'er');}
     },30);
   };
-  reader.onerror=function(){clearTimeout(tmr);showSts('Erreur lecture.','er');};
-  if(ext==='docx')reader.readAsArrayBuffer(file);
+  reader.onerror=function(){showSts('Erreur lecture.','er');};
+  if(ext==='docx'||ext==='rtf') reader.readAsArrayBuffer(file);
   else reader.readAsText(file);
 }
 function afterLoad(n){document.getElementById('fnm').textContent=n;document.getElementById('ftag').style.display='flex';document.getElementById('bgo').disabled=false;updatePreview();hideSts();}
@@ -346,6 +356,29 @@ function doCopy(){if(!resultText)return;navigator.clipboard.writeText(resultText
 function showSts(html,type){var el=document.getElementById('sts');el.style.display='flex';el.className='sts '+(type==='ok'?'sok':type==='er'?'ser':'sld');el.innerHTML=html;}
 function hideSts(){document.getElementById('sts').style.display='none';}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function setInput(mode){
+  var isFile=(mode==='file');
+  document.getElementById('zinput-file').style.display=isFile?'block':'none';
+  document.getElementById('zinput-text').style.display=isFile?'none':'block';
+  document.getElementById('tbf').style.background=isFile?'#1a1916':'none';
+  document.getElementById('tbf').style.color=isFile?'#fff':'var(--t2)';
+  document.getElementById('tbt').style.background=isFile?'none':'#1a1916';
+  document.getElementById('tbt').style.color=isFile?'var(--t2)':'#fff';
+  if(!isFile){fileText='';document.getElementById('bgo').disabled=!document.getElementById('tpaste').value.trim();}
+  else{document.getElementById('bgo').disabled=!fileText;}
+}
+function onPasteInput(){
+  var v=document.getElementById('tpaste').value.trim();
+  fileText=v;
+  document.getElementById('bgo').disabled=!v;
+  if(v)updatePreview();
+}
+function clearPaste(){
+  document.getElementById('tpaste').value='';
+  fileText='';
+  document.getElementById('bgo').disabled=true;
+  document.getElementById('pvw').style.display='none';
+}
 init();
 </script>
 </body>
